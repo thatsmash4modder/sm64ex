@@ -35,6 +35,8 @@ bool sm64_have_painting[NUM_PAINTING_LOCKS];
 int sm64_completion_type = 0;
 std::bitset<SM64AP_NUM_ABILITIES> sm64_have_abilities;
 int* sm64_clockaction = nullptr;
+int sm64_key_piece_count = 1;
+int sm64_key_pieces = 0;
 int sm64_cost_firstbowserdoor = 8;
 int sm64_cost_basementdoor = 30;
 int sm64_cost_secondfloordoor = 50;
@@ -68,6 +70,14 @@ void SM64AP_RecvItem(int64_t idx, bool notify) {
         case SM64AP_ID_KEYPROG:
             sm64_have_key2 = sm64_have_key1;
             sm64_have_key1 = true;
+            break;
+        case SM64AP_ID_KEYPIECE:
+            sm64_key_pieces++
+            if (sm64_key_pieces >= sm64_key_piece_count) {
+                sm64_key_pieces = 0;
+                sm64_have_key2 = sm64_have_key1;
+                sm64_have_key1 = true;
+            }
             break;
         case SM64AP_ID_WINGCAP:
             sm64_have_wingcap = true;
@@ -251,6 +261,10 @@ void SM64AP_SetClockToTTCState() {
     sm64_clockaction = nullptr;
 }
 
+void SM64AP_SetKeyPieceAmount(int amount) {
+    sm64_key_piece_count = amount;
+}
+
 void SM64AP_SetFirstBowserDoorCost(int amount) {
     sm64_cost_firstbowserdoor = amount;
 }
@@ -348,6 +362,7 @@ void SM64AP_GenericInit() {
     AP_SetNotify(AP_GetPrivateServerDataPrefix() + "FinishedBowser", AP_DataType::Int);
     AP_SetNotify(AP_GetPrivateServerDataPrefix() + "MoatDrained", AP_DataType::Int);
 
+    AP_RegisterSlotDataIntCallback("KeyPieceAmount", &SM64AP_SetKeyPieceAmount);
     AP_RegisterSlotDataIntCallback("FirstBowserDoorCost", &SM64AP_SetFirstBowserDoorCost);
     AP_RegisterSlotDataIntCallback("BasementDoorCost", &SM64AP_SetBasementDoorCost);
     AP_RegisterSlotDataIntCallback("SecondFloorDoorCost", &SM64AP_SetSecondFloorDoorCost);
