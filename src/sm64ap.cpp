@@ -72,7 +72,7 @@ void SM64AP_RecvItem(int64_t idx, bool notify) {
             sm64_have_key1 = true;
             break;
         case SM64AP_ID_KEYPIECE:
-            sm64_key_pieces++
+            sm64_key_pieces++;
             if (sm64_key_pieces >= sm64_key_piece_count) {
                 sm64_key_pieces = 0;
                 sm64_have_key2 = sm64_have_key1;
