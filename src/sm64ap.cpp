@@ -26,6 +26,8 @@ int starsCollected = 0;
 bool sm64_locations[SM64AP_NUM_LOCS];
 bool sm64_have_key1 = false;
 bool sm64_have_key2 = false;
+bool sm64_have_key3 = true;
+bool sm64_using_key3 = false;
 bool sm64_have_wingcap = false;
 bool sm64_have_metalcap = false;
 bool sm64_have_vanishcap = false;
@@ -37,6 +39,8 @@ std::bitset<SM64AP_NUM_ABILITIES> sm64_have_abilities;
 int* sm64_clockaction = nullptr;
 int sm64_key_piece_count = 1;
 int sm64_key_pieces = 0;
+int sm64_bowser_key_piece_count = 1;
+int sm64_bowser_key_pieces = 0;
 int sm64_cost_firstbowserdoor = 8;
 int sm64_cost_basementdoor = 30;
 int sm64_cost_secondfloordoor = 50;
@@ -67,16 +71,35 @@ void SM64AP_RecvItem(int64_t idx, bool notify) {
         case SM64AP_ID_KEY2:
             sm64_have_key2 = true;
             break;
+        case SM64AP_ID_KEY3:
+            sm64_have_key3 = true;
+            break;
+        case SM64AP_ID_KEY3PIECE:
+            sm64_bowser_key_pieces++;
+            if (sm64_bowser_key_pieces >= sm64_bowser_key_piece_count) {
+                sm64_have_key3 = true;
+            }
+            break;
         case SM64AP_ID_KEYPROG:
-            sm64_have_key2 = sm64_have_key1;
-            sm64_have_key1 = true;
+            if (sm64_have_key2) {
+                    sm64_have_key3 = true;
+                } else if (sm64_have_key1) {
+                    sm64_have_key2 = true;
+                } else {
+                    sm64_have_key1 = true;
+                }
             break;
         case SM64AP_ID_KEYPIECE:
             sm64_key_pieces++;
             if (sm64_key_pieces >= sm64_key_piece_count) {
+                if (sm64_have_key2) {
+                    sm64_have_key3 = true;
+                } else if (sm64_have_key1) {
+                    sm64_have_key2 = true;
+                } else {
+                    sm64_have_key1 = true;
+                }
                 sm64_key_pieces = 0;
-                sm64_have_key2 = sm64_have_key1;
-                sm64_have_key1 = true;
             }
             break;
         case SM64AP_ID_WINGCAP:
@@ -205,6 +228,9 @@ void setCourseNodeAndArea(int coursenum, s16* oldnode, bool isDeathWarp, int war
 void SM64AP_RedirectWarp(s16* curLevel, s16* destLevel, s8* curArea, s16* destArea, s16* destWarpNode, bool isDeathWarp, int warpOp) {
     // When warping, always lock the clock and reset var to avoid segfault if old clock val is not in new area
     SM64AP_SetClockToTTCState();
+    if (*destLevel == LEVEL_BOWSER_3 && sm64_using_key3 && !sm64_have_key3) {
+        *destLevel = LEVEL_CASTLE_GROUNDS;
+    }
     if (*destLevel == LEVEL_BOWSER_3 || *curLevel == LEVEL_BOWSER_3 ||
         *destLevel == LEVEL_BITS || *curLevel == LEVEL_BITS) return; // Dont play around with this one
     if (*destWarpNode >= WARP_NODE_CREDITS_MIN) return; // Credit Warps
@@ -263,6 +289,14 @@ void SM64AP_SetClockToTTCState() {
 
 void SM64AP_SetKeyPieceAmount(int amount) {
     sm64_key_piece_count = amount;
+}
+
+void SM64AP_SetBowserKeyPieceAmount(int amount) {
+    sm64_bowser_key_piece_count = amount;
+}
+
+void SM64AP_SetUsingBowserKey(bool using) {
+    sm64_using_key3 = using;
 }
 
 void SM64AP_SetFirstBowserDoorCost(int amount) {
@@ -363,6 +397,8 @@ void SM64AP_GenericInit() {
     AP_SetNotify(AP_GetPrivateServerDataPrefix() + "MoatDrained", AP_DataType::Int);
 
     AP_RegisterSlotDataIntCallback("KeyPieceAmount", &SM64AP_SetKeyPieceAmount);
+    AP_RegisterSlotDataIntCallback("BowserKeyPieceAmount", &SM64AP_SetBowserKeyPieceAmount);
+    AP_RegisterSlotDataIntCallback("UsingBowserKey", &SM64AP_SetUsingBowserKey);
     AP_RegisterSlotDataIntCallback("FirstBowserDoorCost", &SM64AP_SetFirstBowserDoorCost);
     AP_RegisterSlotDataIntCallback("BasementDoorCost", &SM64AP_SetBasementDoorCost);
     AP_RegisterSlotDataIntCallback("SecondFloorDoorCost", &SM64AP_SetSecondFloorDoorCost);
@@ -496,6 +532,14 @@ bool SM64AP_HaveKey1() {
 
 bool SM64AP_HaveKey2() {
     return sm64_have_key2;
+}
+
+bool SM64AP_HaveKey3() {
+    return sm64_have_key3;
+}
+
+bool SM64AP_UsingKey3() {
+    return sm64_using_key3;
 }
 
 bool SM64AP_HaveCap(int flag) {
