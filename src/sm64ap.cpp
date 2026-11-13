@@ -26,7 +26,7 @@ int starsCollected = 0;
 bool sm64_locations[SM64AP_NUM_LOCS];
 bool sm64_have_key1 = false;
 bool sm64_have_key2 = false;
-bool sm64_have_key3 = true;
+bool sm64_have_key3 = false;
 int sm64_using_key3 = false;
 bool sm64_have_wingcap = false;
 bool sm64_have_metalcap = false;
