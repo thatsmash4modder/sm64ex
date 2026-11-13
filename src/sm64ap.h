@@ -85,6 +85,8 @@ AP_EXTERN_C void SM64AP_SetClockToTTCState();
 AP_EXTERN_C bool SM64AP_CheckedLoc(int);
 AP_EXTERN_C bool SM64AP_HaveKey1();
 AP_EXTERN_C bool SM64AP_HaveKey2();
+AP_EXTERN_C bool SM64AP_HaveKey3();
+AP_EXTERN_C bool SM64AP_UsingKey3();
 AP_EXTERN_C bool SM64AP_HaveCap(int);
 AP_EXTERN_C bool SM64AP_HaveCannon(int);
 AP_EXTERN_C bool SM64AP_HavePainting(int);

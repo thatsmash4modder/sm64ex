@@ -539,7 +539,7 @@ bool SM64AP_HaveKey3() {
 }
 
 bool SM64AP_UsingKey3() {
-    return sm64_using_key3;
+    return sm64_using_key3 != 0;
 }
 
 bool SM64AP_HaveCap(int flag) {
