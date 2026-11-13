@@ -27,7 +27,7 @@ bool sm64_locations[SM64AP_NUM_LOCS];
 bool sm64_have_key1 = false;
 bool sm64_have_key2 = false;
 bool sm64_have_key3 = true;
-bool sm64_using_key3 = false;
+int sm64_using_key3 = false;
 bool sm64_have_wingcap = false;
 bool sm64_have_metalcap = false;
 bool sm64_have_vanishcap = false;
@@ -228,7 +228,7 @@ void setCourseNodeAndArea(int coursenum, s16* oldnode, bool isDeathWarp, int war
 void SM64AP_RedirectWarp(s16* curLevel, s16* destLevel, s8* curArea, s16* destArea, s16* destWarpNode, bool isDeathWarp, int warpOp) {
     // When warping, always lock the clock and reset var to avoid segfault if old clock val is not in new area
     SM64AP_SetClockToTTCState();
-    if (*destLevel == LEVEL_BOWSER_3 && sm64_using_key3 && !sm64_have_key3) {
+    if (*destLevel == LEVEL_BOWSER_3 && sm64_using_key3 != 0 && !sm64_have_key3) {
         *destLevel = LEVEL_CASTLE_GROUNDS;
     }
     if (*destLevel == LEVEL_BOWSER_3 || *curLevel == LEVEL_BOWSER_3 ||
@@ -295,8 +295,8 @@ void SM64AP_SetBowserKeyPieceAmount(int amount) {
     sm64_bowser_key_piece_count = amount;
 }
 
-void SM64AP_SetUsingBowserKey(bool using) {
-    sm64_using_key3 = using;
+void SM64AP_SetUsingBowserKey(int amount) {
+    sm64_using_key3 = amount;
 }
 
 void SM64AP_SetFirstBowserDoorCost(int amount) {
