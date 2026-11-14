@@ -1,6 +1,6 @@
 #include "sm64ap.h"
 #include "Archipelago.h"
-#include "save_file.h"
+#include "game/save_file.h"
 
 extern "C" {
     #include "game/print.h"
