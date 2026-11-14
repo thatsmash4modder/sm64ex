@@ -230,7 +230,7 @@ void setCourseNodeAndArea(int coursenum, s16* oldnode, bool isDeathWarp, int war
 void SM64AP_RedirectWarp(s16* curLevel, s16* destLevel, s8* curArea, s16* destArea, s16* destWarpNode, bool isDeathWarp, int warpOp) {
     // When warping, always lock the clock and reset var to avoid segfault if old clock val is not in new area
     SM64AP_SetClockToTTCState();
-    if (*destLevel == LEVEL_BOWSER_3 && ((sm64_using_key3 != 0 && !sm64_have_key3) || (sm64_lock_bowser_by_stars && save_file_get_total_star_count(gCurrSaveFileNum - 1, 0, 24) < sm64_cost_endlessstairs)) {
+    if (*destLevel == LEVEL_BOWSER_3 && ((sm64_using_key3 != 0 && !sm64_have_key3) || (sm64_lock_bowser_by_stars != 0 && save_file_get_total_star_count(gCurrSaveFileNum - 1, 0, 24) < sm64_cost_endlessstairs))) {
         *destLevel = LEVEL_CASTLE_GROUNDS;
     }
     if (*destLevel == LEVEL_BOWSER_3 || *curLevel == LEVEL_BOWSER_3 ||
