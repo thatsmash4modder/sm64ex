@@ -15,7 +15,7 @@ void bhv_mips_init(void) {
     starFlags = save_file_get_star_flags(gCurrSaveFileNum - 1, -1);
 
     // If the player has >= 15 stars and hasn't collected first MIPS star...
-    if (save_file_get_total_star_count(gCurrSaveFileNum - 1, 0, 24) >= SM64AP_GetRequiredStars(SM64AP_LOCATIONID_MIPS1) && !SM64AP_CheckedLoc(SM64AP_LOCATIONID_MIPS1)) {
+    if (save_file_get_total_star_count(gCurrSaveFileNum - 1, 0, 24) >= SM64AP_GetRequiredStars(SM64AP_LOCATIONID_MIPS1) && (!SM64AP_CheckedLoc(SM64AP_LOCATIONID_MIPS1) || (SM64AP_UsingMipsClip() && save_file_get_total_star_count(gCurrSaveFileNum - 1, 0, 24) >= SM64AP_GetRequiredStars(30)))) {
         o->oBehParams2ndByte = 0;
 #ifndef VERSION_JP
         o->oMipsForwardVelocity = 40.0f;

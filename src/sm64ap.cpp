@@ -27,7 +27,9 @@ bool sm64_locations[SM64AP_NUM_LOCS];
 bool sm64_have_key1 = false;
 bool sm64_have_key2 = false;
 bool sm64_have_key3 = false;
-int sm64_using_key3 = false;
+int sm64_using_key3 = 0;
+int sm64_lock_bowser_by_stars = 0;
+int sm64_using_mips_clip = 0;
 bool sm64_have_wingcap = false;
 bool sm64_have_metalcap = false;
 bool sm64_have_vanishcap = false;
@@ -228,7 +230,7 @@ void setCourseNodeAndArea(int coursenum, s16* oldnode, bool isDeathWarp, int war
 void SM64AP_RedirectWarp(s16* curLevel, s16* destLevel, s8* curArea, s16* destArea, s16* destWarpNode, bool isDeathWarp, int warpOp) {
     // When warping, always lock the clock and reset var to avoid segfault if old clock val is not in new area
     SM64AP_SetClockToTTCState();
-    if (*destLevel == LEVEL_BOWSER_3 && sm64_using_key3 != 0 && !sm64_have_key3) {
+    if (*destLevel == LEVEL_BOWSER_3 && ((sm64_using_key3 != 0 && !sm64_have_key3) || (sm64_lock_bowser_by_stars && save_file_get_total_star_count(gCurrSaveFileNum - 1, 0, 24) < sm64_cost_endlessstairs)) {
         *destLevel = LEVEL_CASTLE_GROUNDS;
     }
     if (*destLevel == LEVEL_BOWSER_3 || *curLevel == LEVEL_BOWSER_3 ||
@@ -297,6 +299,14 @@ void SM64AP_SetBowserKeyPieceAmount(int amount) {
 
 void SM64AP_SetUsingBowserKey(int amount) {
     sm64_using_key3 = amount;
+}
+
+void SM64AP_SetLockBowser(int amount) {
+    sm64_lock_bowser_by_stars = amount;
+}
+
+void SM64AP_SetUsingMipsClip(int amount) {
+    sm64_using_mips_clip = amount;
 }
 
 void SM64AP_SetFirstBowserDoorCost(int amount) {
@@ -399,6 +409,8 @@ void SM64AP_GenericInit() {
     AP_RegisterSlotDataIntCallback("KeyPieceAmount", &SM64AP_SetKeyPieceAmount);
     AP_RegisterSlotDataIntCallback("BowserKeyPieceAmount", &SM64AP_SetBowserKeyPieceAmount);
     AP_RegisterSlotDataIntCallback("UsingBowserKey", &SM64AP_SetUsingBowserKey);
+    AP_RegisterSlotDataIntCallback("UsingMipsClip", &SM64AP_SetUsingMipsClip);
+    AP_RegisterSlotDataIntCallback("LockBowserByStars", &SM64AP_SetLockBowser);
     AP_RegisterSlotDataIntCallback("FirstBowserDoorCost", &SM64AP_SetFirstBowserDoorCost);
     AP_RegisterSlotDataIntCallback("BasementDoorCost", &SM64AP_SetBasementDoorCost);
     AP_RegisterSlotDataIntCallback("SecondFloorDoorCost", &SM64AP_SetSecondFloorDoorCost);
@@ -540,6 +552,14 @@ bool SM64AP_HaveKey3() {
 
 bool SM64AP_UsingKey3() {
     return sm64_using_key3 != 0;
+}
+
+bool SM64AP_LockBowserByStars() {
+    return sm64_lock_bowser_by_stars != 0;
+}
+
+bool SM64AP_UsingMipsClip() {
+    return sm64_using_mips_clip != 0;
 }
 
 bool SM64AP_HaveCap(int flag) {
